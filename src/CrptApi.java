@@ -25,10 +25,9 @@ public class CrptApi {
     }
 
     public void createDocument(Document document, String signature) throws IOException, InterruptedException {
-        // Convert document to JSON manually
+//        Create "document" to json-stroke
         String requestBody = toJson(document);
-
-        // Ensure rate limiting
+//        Sync and check count requests
         synchronized (this) {
             while (requestCount.get() >= requestLimit) {
                 long oldestTimestamp = requestTimestamps.peek();
@@ -44,7 +43,7 @@ public class CrptApi {
             requestCount.incrementAndGet();
         }
 
-        // Create and send the request
+//       Create and send request
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://ismp.crpt.ru/api/v3/lk/documents/create"))
                 .timeout(Duration.ofMinutes(1))
@@ -60,6 +59,7 @@ public class CrptApi {
         }
     }
 
+    //    Create main to json
     private String toJson(Document document) {
         StringBuilder json = new StringBuilder();
         json.append("{");
@@ -80,9 +80,11 @@ public class CrptApi {
         return json.toString();
     }
 
+
     private String toJson(Document.Description description) {
         return "{\"participantInn\":\"" + description.participantInn + "\"}";
     }
+
 
     private String toJson(Document.Product[] products) {
         StringBuilder json = new StringBuilder();
@@ -102,6 +104,7 @@ public class CrptApi {
         }
         return json.toString();
     }
+
 
     public static class Document {
         public Description description;
